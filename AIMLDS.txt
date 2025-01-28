@@ -1,0 +1,150 @@
+Python : -
+
+There are four collection data types in the Python programming language:
+
+List is a collection which is ordered and changeable. Allows duplicate members.
+Tuple is a collection which is ordered and unchangeable. Allows duplicate members.
+Set is a collection which is unordered, unchangeable*, and unindexed. No duplicate members.
+Dictionary is a collection which is ordered** and changeable. No duplicate members.
+
+NLP : -
+
+Stemming : Applying stemming to the words or sentence.
+
+Types of Stemming : -
+
+1. PoterStemmer
+2. RegexStemmer
+3. SnowballStemmer
+
+Lematization : -
+
+It will give good output interms of words.
+
+StopWords
+
+Parts of Speech
+
+Text -> Vector Conversion : -
+
+1. One hot Encoding
+2. Bag of words (BOW)
+3. TF-IDF
+4. Word2Vec
+5. Avg word2Vecs
+
+One hot Encoding : -
+
+Advantages : -
+1. Easy to implement with python
+
+DisAdvantages : -
+1. Sparse Matrix -> Overfitting
+2. Machine Learning Algorithm -> Fixed size inputs are not there
+3. No Symantic meaning is getting captured
+4. Out of Vocabulary (OOV)
+
+   Bang or words & Binary BOW : -
+
+Binary BOW : -
+
+{1 and 0}
+
+BOW : -
+
+{Count will get updated based on frequency}
+
+[2 1 0]
+[1 0 1]
+[1 1 1]
+
+TF-IDF : - (Term Frequency - Inverse Document Frequency)
+
+s1 -> good boy
+s2 -> good girl
+s3 -> boy girl good
+
+  TF = No.of rep of words in sentence/ No.of words in sentence
+
+IDF = loge(No.of sentences/No.of sentences containing the word)
+
+
+TF                                                IDF
+
+        s1      s2     s3                   words        IDF
+
+good    1/2    1/2     1/3                  good     loge(3/3)=0  
+
+boy     1/2     0      1/3                  boy      loge(3/2)
+
+girl    0      1/2     1/3                  girl     loge(3/2)
+
+
+Final TF & IDF
+
+      good   boy               girl
+s1     0     1/2*loge(3/2)     0
+
+s2     0     0                 1/2*loge(3/2) 
+
+s3     0     1/3*loge(3/2)     1/3*loge(3/2) 
+
+Advantages : -
+
+1. Intutive
+2. Fixed size -> Vocabulary size
+3. Word importance is getting captured.
+
+DisAdvantages : -
+
+1. Sparsity still exists
+2. OOV
+
+
+Word Embeddings 
+
+1. Count or Frequency                       2. Deep Learning Trained Model
+
+   a. One Hot Encoding                                word2vec 
+   b. BOW
+   c. TF-IDF	                             a. CBOW(Continuous Bag of words)            b. Skipgram
+
+small Dataset -> CBOW Can be used
+Large Dataset -> Skipgram can be used
+
+Advantages of word2vec : -
+
+1. Sparse Matrix -> Dense Matrix
+2. Scematic Info is getting captured [Honest, Good]
+3. Vocabulary size -> Fixed set of dimension vectors 
+                      Google word2vec [300 dimension]
+4. OOV is also solved
+
+NLP In Deep Learning : -
+
+ANN -> Artificial Nueral Networks (Tabular Data) : Sequence of Data Doesn't matter
+
+1. Classification
+2. Regression
+
+CNN -> Convacational Nueral Networs (Images, Video Frames as Data)
+
+Ex : - Image Classification, Object Detection
+
+DisAdvantages of ANN : -
+
+1. Meaning of the senetence is getting changed
+2. Sequential Data is not maintained
+
+Simple RNN (Recurrent Nueral Networks) : - Sequential Data is maintained
+
+
+   
+
+
+
+
+
+
+
+
