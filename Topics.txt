@@ -1,0 +1,1043 @@
+100467751261
+
+
+Sanity testing is a type of software testing that is performed to quickly evaluate whether a particular function
+or feature of an application is working as expected after changes have been made to it (such as bug fixes, new features, or updates).
+It is usually conducted before more extensive testing like regression testing or system testing to determine whether the application is
+stable enough for further testing.
+
+Smoke Testing, on the other hand, is usually broader and involves verifying whether the overall system or build is stable enough to
+proceed with more thorough testing. Smoke testing is often the first level of testing after a new build is deployed.
+
+Smoke testing is a type of preliminary testing that is performed to ensure that the most critical functions of an application are working as expected,
+and the application is stable enough for more thorough testing. It’s often referred to as a "sanity check" to verify that the application is not "broken"
+at a high level and is worth testing further.
+
+SELECT DISTINCT salary FROM employees ORDER BY salary DESC LIMIT 1 OFFSET 3;
+
+BDD Cucumber Annotations : -
+
+@Before
+Purpose: Executes a block of code before each scenario. Useful for setup tasks.
+Example:
+@Before
+public void setUp() {
+    // Code to set up preconditions
+}
+
+@After
+Purpose: Executes a block of code after each scenario. Useful for cleanup tasks.
+Example:
+@After
+public void tearDown() {
+    // Code to clean up after the scenario
+}
+
+@CucumberOptions
+Purpose: Configures various options for the Cucumber test runner, such as the location of feature files and step definitions.
+Example:
+@RunWith(Cucumber.class)
+@CucumberOptions(
+    features = "src/test/resources/features",
+    glue = "stepDefinitions",
+    plugin = {"pretty", "html:target/cucumber-reports"}
+)
+public class TestRunner {
+    // This class remains empty
+}
+
+The Singleton design pattern is often used in Selenium automation frameworks to ensure that a class has only one instance and provides a global point of access to it. This is particularly useful for managing resources like WebDriver instances, configuration settings, or logging mechanisms.
+
+Here's a basic example of how you might implement a Singleton class for a WebDriver instance in Java:
+
+public class WebDriverSingleton {
+    private static WebDriver driver;
+
+    // Private constructor to prevent instantiation
+    private WebDriverSingleton() {
+    }
+
+    public static WebDriver getDriver() {
+        if (driver == null) {
+            // Initialize the WebDriver instance here
+            driver = new ChromeDriver();
+        }
+        return driver;
+    }
+
+    public static void quitDriver() {
+        if (driver != null) {
+            driver.quit();
+            driver = null;
+        }
+    }
+}
+
+Key Points:
+Private Constructor: Prevents instantiation from outside the class.
+Static Method: Provides a global point of access to the instance.
+Lazy Initialization: The instance is created only when it is needed.
+This pattern helps in managing the WebDriver instance efficiently, ensuring that only one instance is used throughout the test execution, which can help in reducing resource consumption and avoiding potential conflicts.
+
+Page Factory : -
+
+The PageFactory class in Selenium is an extension of the Page Object Model (POM) that simplifies the initialization of web elements. It provides a more efficient way to manage and interact with web elements in your automation framework.
+
+Key Concepts of PageFactory:
+Initialization of Web Elements: PageFactory uses annotations to initialize web elements.
+Lazy Initialization: Web elements are initialized only when they are used, which can improve performance.
+
+Example Implementation in Java:
+Here's a basic example of how to implement PageFactory in a Selenium automation framework:
+
+Create a Page Class:
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+
+public class LoginPage {
+    WebDriver driver;
+
+    // Locate elements using @FindBy annotation
+    @FindBy(id = "username")
+    WebElement username;
+
+    @FindBy(id = "password")
+    WebElement password;
+
+    @FindBy(id = "loginButton")
+    WebElement loginButton;
+
+    // Constructor to initialize elements
+    public LoginPage(WebDriver driver) {
+        this.driver = driver;
+        PageFactory.initElements(driver, this);
+    }
+
+    // Method to perform login
+    public void login(String user, String pass) {
+        username.sendKeys(user);
+        password.sendKeys(pass);
+        loginButton.click();
+    }
+}
+Use the Page Class in a Test:
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+public class LoginTest {
+    WebDriver driver;
+    LoginPage loginPage;
+
+    @BeforeClass
+    public void setUp() {
+        // Set up WebDriver and initialize the page object
+        driver = new ChromeDriver();
+        driver.get("https://example.com/login");
+        loginPage = new LoginPage(driver);
+    }
+
+    @Test
+    public void testLogin() {
+        // Use the login method from the page object
+        loginPage.login("testuser", "testpassword");
+    }
+
+    @AfterClass
+    public void tearDown() {
+        // Close the browser
+        driver.quit();
+    }
+}
+Benefits of Using PageFactory:
+Improved Code Readability: Annotations make the code cleaner and easier to read.
+Reduced Code Duplication: Reusable page methods help in maintaining the code.
+Enhanced Maintainability: Changes in web elements need to be updated only in the page class.
+PageFactory is a powerful tool in Selenium that helps streamline the creation and management of page objects, making your automation framework more efficient and maintainable
+
+Screenshots : -
+
+Capturing screenshots of failed tests in a Selenium Java automation framework is a common practice to help diagnose issues. Below is an example of how you can implement this using TestNG and the TakesScreenshot interface.
+
+Step-by-Step Implementation:
+Create a Utility Class for Screenshots:
+
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.io.FileHandler;
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+public class ScreenshotUtil {
+    public static void captureScreenshot(WebDriver driver, String screenshotName) {
+        try {
+            File source = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+            String timestamp = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+            FileHandler.copy(source, new File("./Screenshots/" + screenshotName + "_" + timestamp + ".png"));
+            System.out.println("Screenshot taken: " + screenshotName);
+        } catch (IOException e) {
+            System.out.println("Exception while taking screenshot: " + e.getMessage());
+        }
+    }
+}
+Integrate Screenshot Capture in TestNG Listener:
+
+import org.testng.ITestContext;
+import org.testng.ITestListener;
+import org.testng.ITestResult;
+import org.openqa.selenium.WebDriver;
+
+public class TestListener implements ITestListener {
+    WebDriver driver;
+
+    @Override
+    public void onTestFailure(ITestResult result) {
+        Object currentClass = result.getInstance();
+        driver = ((BaseTest) currentClass).getDriver();
+        ScreenshotUtil.captureScreenshot(driver, result.getName());
+    }
+
+    @Override
+    public void onTestStart(ITestResult result) {}
+    @Override
+    public void onTestSuccess(ITestResult result) {}
+    @Override
+    public void onTestSkipped(ITestResult result) {}
+    @Override
+    public void onTestFailedButWithinSuccessPercentage(ITestResult result) {}
+    @Override
+    public void onStart(ITestContext context) {}
+    @Override
+    public void onFinish(ITestContext context) {}
+}
+Base Test Class to Provide WebDriver Instance:
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+
+public class BaseTest {
+    protected WebDriver driver;
+
+    @BeforeClass
+    public void setUp() {
+        driver = new ChromeDriver();
+        driver.manage().window().maximize();
+        driver.get("https://example.com");
+    }
+
+    @AfterClass
+    public void tearDown() {
+        if (driver != null) {
+            driver.quit();
+        }
+    }
+
+    public WebDriver getDriver() {
+        return driver;
+    }
+}
+Test Class Example:
+
+import org.testng.Assert;
+import org.testng.annotations.Listeners;
+import org.testng.annotations.Test;
+
+@Listeners(TestListener.class)
+public class SampleTest extends BaseTest {
+    @Test
+    public void testExample() {
+        // Intentionally failing the test to capture screenshot
+        Assert.fail("Failing the test to capture screenshot");
+    }
+}
+Explanation:
+ScreenshotUtil: Contains the method to capture and save screenshots.
+TestListener: Implements ITestListener to hook into the test lifecycle and capture screenshots on test failure.
+BaseTest: Provides the WebDriver setup and teardown methods.
+SampleTest: Demonstrates a test that intentionally fails to trigger the screenshot capture.
+This setup ensures that whenever a test fails, a screenshot is captured and saved with a timestamp, making it easier to debug issues
+
+To read data from a CSV file and use it to automate BDD Cucumber scenarios with Java and Selenium, you can follow these steps:
+
+Step-by-Step Implementation:
+Add Dependencies: Ensure you have the necessary dependencies in your pom.xml file:
+
+<dependency>
+    <groupId>io.cucumber</groupId>
+    <artifactId>cucumber-java</artifactId>
+    <version>7.0.0</version>
+</dependency>
+<dependency>
+    <groupId>io.cucumber</groupId>
+    <artifactId>cucumber-junit</artifactId>
+    <version>7.0.0</version>
+</dependency>
+<dependency>
+    <groupId>org.seleniumhq.selenium</groupId>
+    <artifactId>selenium-java</artifactId>
+    <version>4.0.0</version>
+</dependency>
+<dependency>
+    <groupId>com.opencsv</groupId>
+    <artifactId>opencsv</artifactId>
+    <version>5.5.2</version>
+</dependency>
+Create a Utility Class to Read CSV Data:
+
+import com.opencsv.CSVReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class CSVUtil {
+    public static List<String[]> readCSV(String filePath) {
+        List<String[]> data = new ArrayList<>();
+        try (CSVReader reader = new CSVReader(new FileReader(filePath))) {
+            String[] line;
+            while ((line = reader.readNext()) != null) {
+                data.add(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return data;
+    }
+}
+Create a Hook to Load CSV Data:
+
+import io.cucumber.java.Before;
+import java.util.List;
+
+public class Hooks {
+    public static List<String[]> testData;
+
+    @Before
+    public void loadData() {
+        testData = CSVUtil.readCSV("path/to/your/csvfile.csv");
+    }
+}
+Feature File Example:
+
+Feature: Login functionality
+
+Scenario Outline: Successful login with valid credentials
+    Given the user is on the login page
+    When the user enters "<username>" and "<password>"
+    Then the user should be redirected to the homepage
+
+    Examples:
+      | username | password |
+      | <username> | <password> |
+Step Definitions:
+
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+
+public class LoginSteps {
+    WebDriver driver;
+
+    @Given("the user is on the login page")
+    public void the_user_is_on_the_login_page() {
+        driver = new ChromeDriver();
+        driver.get("https://example.com/login");
+    }
+
+    @When("the user enters {string} and {string}")
+    public void the_user_enters_and(String username, String password) {
+        // Code to enter username and password
+    }
+
+    @Then("the user should be redirected to the homepage")
+    public void the_user_should_be_redirected_to_the_homepage() {
+        // Code to verify redirection
+        driver.quit();
+    }
+}
+Test Runner Class:
+
+import org.junit.runner.RunWith;
+import io.cucumber.junit.Cucumber;
+import io.cucumber.junit.CucumberOptions;
+
+@RunWith(Cucumber.class)
+@CucumberOptions(
+    features = "src/test/resources/features",
+    glue = {"stepDefinitions", "Hooks"},
+    plugin = {"pretty", "html:target/cucumber-reports"}
+)
+public class TestRunner {
+}
+Explanation:
+CSVUtil: Reads data from a CSV file and returns it as a list of string arrays.
+Hooks: Loads the CSV data before the test execution.
+Feature File: Uses Scenario Outline and Examples to parameterize the test with data from the CSV file.
+Step Definitions: Implements the steps defined in the feature file.
+Test Runner: Configures and runs the Cucumber tests.
+This setup allows you to read data from a CSV file and use it to drive your BDD Cucumber scenarios, making your tests more flexible and data-driven
+
+In Selenium automation frameworks, several core Java concepts are essential for building robust and maintainable test scripts. Here are some of the key concepts:
+
+1. Object-Oriented Programming (OOP) Concepts:
+Inheritance: Allows a class to inherit properties and methods from another class. This is useful for creating a base class with common methods and extending it in other classes.
+Encapsulation: Bundles the data (variables) and methods (functions) that operate on the data into a single unit or class. It helps in hiding the internal state of the object from the outside world.
+Polymorphism: Allows methods to do different things based on the object it is acting upon. This includes method overloading (same method name with different parameters) and method overriding (subclass provides a specific implementation of a method already defined in its superclass).
+Abstraction: Hides the complex implementation details and shows only the essential features of the object. This is often achieved using abstract classes and interfaces.
+2. Basic Java Syntax and Control Statements:
+Variables and Data Types: Understanding how to declare and use variables of different data types.
+Control Statements: Using if-else, switch-case, loops (for, while, do-while) to control the flow of the program.
+3. Exception Handling:
+Handling exceptions using try-catch blocks to manage errors and exceptions gracefully during test execution.
+4. Collections Framework:
+Using collections like List, Set, Map to store, retrieve, and manipulate groups of objects. This is particularly useful for handling multiple web elements and test data.
+5. File Handling:
+Reading from and writing to files, such as reading test data from CSV or Excel files and writing test results to log files.
+6. Multithreading:
+Running multiple threads simultaneously to perform parallel test execution, which can significantly reduce the time taken for test runs.
+7. Java Libraries and APIs:
+Utilizing various Java libraries and APIs, such as Apache POI for handling Excel files, and Jackson or Gson for JSON parsing.
+Example of OOP Concepts in Selenium:
+Here's a brief example demonstrating inheritance and encapsulation in a Selenium framework:
+
+// Base class with common methods
+public class BasePage {
+    protected WebDriver driver;
+
+    public BasePage(WebDriver driver) {
+        this.driver = driver;
+    }
+
+    public void navigateTo(String url) {
+        driver.get(url);
+    }
+}
+
+// LoginPage class extending BasePage
+public class LoginPage extends BasePage {
+    @FindBy(id = "username")
+    private WebElement username;
+
+    @FindBy(id = "password")
+    private WebElement password;
+
+    @FindBy(id = "loginButton")
+    private WebElement loginButton;
+
+    public LoginPage(WebDriver driver) {
+        super(driver);
+        PageFactory.initElements(driver, this);
+    }
+
+    public void login(String user, String pass) {
+        username.sendKeys(user);
+        password.sendKeys(pass);
+        loginButton.click();
+    }
+}
+In this example:
+
+Inheritance: LoginPage extends BasePage, inheriting its methods.
+Encapsulation: Web elements are private and accessed through public methods.
+These core Java concepts are fundamental to creating a well-structured and efficient Selenium automation framework
+
+Creating a complete Rest Assured API automation framework involves several steps, including setting up the project, writing test cases, and organizing the framework structure. Below is a step-by-step guide to help you build a basic yet comprehensive Rest Assured framework.
+
+Step-by-Step Implementation:
+Project Setup:
+
+Create a Maven Project: Use an IDE like IntelliJ IDEA or Eclipse.
+Add Dependencies: Add the necessary dependencies in your pom.xml file.
+<dependencies>
+    <dependency>
+        <groupId>io.rest-assured</groupId>
+        <artifactId>rest-assured</artifactId>
+        <version>4.3.3</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.testng</groupId>
+        <artifactId>testng</artifactId>
+        <version>7.4.0</version>
+    </dependency>
+    <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+        <version>2.13.1</version>
+    </dependency>
+</dependencies>
+Framework Structure: Organize your project with the following structure:
+
+src
+├── main
+│   └── java
+│       └── utils
+│           └── ConfigUtil.java
+└── test
+    └── java
+        ├── tests
+        │   └── UserTests.java
+        ├── models
+        │   └── User.java
+        ├── utils
+        │   └── TestUtil.java
+        └── resources
+            └── config.properties
+Configuration Utility: Create a utility class to read configuration properties.
+
+package utils;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
+
+public class ConfigUtil {
+    private static Properties properties = new Properties();
+
+    static {
+        try {
+            FileInputStream fis = new FileInputStream("src/test/resources/config.properties");
+            properties.load(fis);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static String getProperty(String key) {
+        return properties.getProperty(key);
+    }
+}
+Model Class: Create a model class for the API response.
+
+package models;
+
+public class User {
+    private String id;
+    private String name;
+    private String email;
+
+    // Getters and Setters
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+}
+Test Utility: Create a utility class for common test methods.
+
+package utils;
+
+import io.restassured.RestAssured;
+import io.restassured.response.Response;
+
+public class TestUtil {
+    public static Response getRequest(String endpoint) {
+        return RestAssured.given()
+                .baseUri(ConfigUtil.getProperty("baseURI"))
+                .when()
+                .get(endpoint);
+    }
+}
+Test Class: Write your test cases using TestNG.
+
+package tests;
+
+import io.restassured.response.Response;
+import models.User;
+import org.testng.Assert;
+import org.testng.annotations.Test;
+import utils.TestUtil;
+
+public class UserTests {
+    @Test
+    public void testGetUser() {
+        Response response = TestUtil.getRequest("/users/1");
+        Assert.assertEquals(response.getStatusCode(), 200);
+
+        User user = response.getBody().as(User.class);
+        Assert.assertEquals(user.getId(), "1");
+        Assert.assertEquals(user.getName(), "John Doe");
+        Assert.assertEquals(user.getEmail(), "john.doe@example.com");
+    }
+}
+Configuration File: Create a config.properties file to store configuration details.
+
+baseURI=https://jsonplaceholder.typicode.com
+Explanation:
+ConfigUtil: Reads configuration properties.
+User: Represents the user model.
+TestUtil: Contains common methods for API requests.
+UserTests: Contains test cases for user-related API endpoints.
+config.properties: Stores configuration details like the base URI.
+This setup provides a basic yet comprehensive structure for a Rest Assured API automation framework. You can expand it by adding more utility classes, models, and test cases as needed
+
+Basic Questions
+What is RestAssured?
+
+RestAssured is a Java-based library used for testing RESTful web services. It simplifies the process of sending HTTP requests and validating responses.
+What are the different HTTP methods supported by RestAssured?
+
+RestAssured supports GET, POST, PUT, DELETE, PATCH, and OPTIONS methods.
+How do you create a basic GET request in RestAssured?
+
+You can create a GET request using the given(), when(), and then() methods:
+given()
+    .baseUri("https://api.example.com")
+.when()
+    .get("/endpoint")
+.then()
+    .statusCode(200);
+Intermediate Questions
+How do you add headers and parameters to a request in RestAssured?
+
+Headers can be added using the header() method, and parameters can be added using the queryParam() or formParam() methods:
+given()
+    .header("Content-Type", "application/json")
+    .queryParam("key", "value")
+.when()
+    .get("/endpoint")
+.then()
+    .statusCode(200);
+How do you handle authentication in RestAssured?
+
+Authentication can be handled using the auth() method. For example, basic authentication:
+given()
+    .auth().basic("username", "password")
+.when()
+    .get("/secure-endpoint")
+.then()
+    .statusCode(200);
+Advanced Questions
+How do you validate the response body in RestAssured?
+
+You can validate the response body using the body() method with Hamcrest matchers:
+given()
+    .baseUri("https://api.example.com")
+.when()
+    .get("/endpoint")
+.then()
+    .body("key", equalTo("value"));
+What is serialization and deserialization in RestAssured?
+
+Serialization is converting an object into a format that can be transmitted over the network (e.g., JSON). Deserialization is converting the received data back into an object. RestAssured supports both JSON and XML serialization/deserialization.
+How do you handle timeouts in RestAssured?
+
+Timeouts can be set using the config() method:
+given()
+    .config(RestAssured.config()
+        .httpClient(HttpClientConfig.httpClientConfig()
+            .setParam("http.connection.timeout", 5000)
+            .setParam("http.socket.timeout", 5000)))
+.when()
+    .get("/endpoint")
+.then()
+    .statusCode(200);
+Scenario-Based Questions
+How would you test a payment gateway API using RestAssured?
+
+You would need to test various scenarios such as successful payments, failed transactions, refunds, and ensure proper handling of authentication and data validation.
+How do you integrate RestAssured tests with a CI/CD pipeline?
+
+RestAssured tests can be integrated with CI/CD tools like Jenkins by configuring the build to run the tests as part of the pipeline, ensuring automated testing on code changes.
+
+Mocking : -
+
+The best way to mock API testing depends on your specific needs and preferences. Here are some popular tools and methods to consider:
+
+Postman: Known for its user-friendly interface, Postman allows you to create mock servers easily. You can define endpoints and responses, making it great for quick setup and testing.
+
+Mockoon: This is a free, open-source desktop application that lets you create mock APIs locally. It's easy to use and supports various features like latency simulation and HTTPS.
+
+WireMock: A robust tool for more complex scenarios, WireMock can simulate different responses, including error conditions and delays. It's highly configurable and can be integrated into your CI/CD pipeline.
+
+Apidog: This tool offers both local and cloud mocking options. It's particularly useful for collaborative API development and testing, providing a no-code platform to create and manage mock APIs.
+
+Beeceptor: A cloud-based service that allows you to create mock APIs without signing in. It's simple to use but has some limitations on the number of requests and data privacy.
+
+Each of these tools has its strengths:
+
+Postman is great for ease of use and quick setup.
+Mockoon is excellent for local development and testing.
+WireMock is ideal for complex and detailed simulations.
+Apidog is perfect for collaborative environments.
+Beeceptor is useful for quick, cloud-based mocking.
+
+Sure! Here are some real-time Java 8 interview questions that are commonly asked for a Senior SDET (Software Development Engineer in Test) position:
+
+What are the new features introduced in Java 8?
+
+Discuss features like lambda expressions, the Stream API, functional interfaces, default methods, and the new Date and Time API.
+Can you explain the concept of lambda expressions and provide an example?
+
+Explain how lambda expressions enable you to treat functionality as a method argument or treat a code as data.
+What is a functional interface?
+
+Describe how a functional interface is an interface with a single abstract method, and how it can be used with lambda expressions.
+How do you use the Stream API in Java 8?
+
+Provide examples of how to use streams for operations like filtering, mapping, and reducing collections of data.
+What are default methods in interfaces?
+
+Explain how default methods allow you to add new methods to interfaces without breaking the existing implementations.
+How does the Optional class work in Java 8?
+
+Discuss how Optional is used to handle null values more gracefully and avoid NullPointerExceptions.
+Can you compare the old Date API with the new Date and Time API introduced in Java 8?
+
+Highlight the improvements and new classes like LocalDate, LocalTime, and LocalDateTime.
+What is the purpose of method references in Java 8?
+
+Explain how method references provide a way to refer to methods without invoking them, using examples.
+How do you handle concurrency with the new features in Java 8?
+
+Discuss enhancements in the java.util.concurrent package and how streams can be used in parallel processing.
+Can you provide an example of using the Collectors class in Java 8?
+
+Show how to use Collectors for collecting stream elements into collections, summarizing statistics, and more.
+These questions cover a range of topics that are crucial for a Senior SDET role, focusing on both theoretical understanding and practical application of Java 8 features. 
+
+Absolutely! Here are the answers to the Java 8 interview questions:
+
+What are the new features introduced in Java 8?
+
+Lambda Expressions: Enable you to treat functionality as a method argument or treat a code as data.
+Stream API: Provides a way to process sequences of elements.
+Functional Interfaces: Interfaces with a single abstract method, used with lambda expressions.
+Default Methods: Allow adding new methods to interfaces without breaking existing implementations.
+New Date and Time API: Provides a comprehensive date and time handling.
+Can you explain the concept of lambda expressions and provide an example?
+
+Lambda expressions are a way to provide clear and concise syntax for writing anonymous methods.
+(parameters) -> expression
+(int a, int b) -> a + b
+What is a functional interface?
+
+A functional interface is an interface with a single abstract method. It can be implemented using lambda expressions.
+@FunctionalInterface
+public interface MyFunctionalInterface {
+    void myMethod();
+}
+How do you use the Stream API in Java 8?
+
+Streams allow you to perform operations like filtering, mapping, and reducing on collections.
+List<String> names = Arrays.asList("John", "Jane", "Jack");
+List<String> filteredNames = names.stream()
+                                  .filter(name -> name.startsWith("J"))
+                                  .collect(Collectors.toList());
+What are default methods in interfaces?
+
+Default methods are methods defined in interfaces with the default keyword, providing a default implementation.
+interface MyInterface {
+    default void myDefaultMethod() {
+        System.out.println("Default Method");
+    }
+}
+How does the Optional class work in Java 8?
+
+Optional is a container object used to contain not-null objects. It helps to avoid NullPointerException.
+Optional<String> optional = Optional.ofNullable("Hello");
+optional.ifPresent(System.out::println);
+Can you compare the old Date API with the new Date and Time API introduced in Java 8?
+
+The new Date and Time API is more comprehensive and user-friendly, with classes like LocalDate, LocalTime, and LocalDateTime.
+LocalDate date = LocalDate.now();
+LocalTime time = LocalTime.now();
+LocalDateTime dateTime = LocalDateTime.now();
+What is the purpose of method references in Java 8?
+
+Method references provide a way to refer to methods without invoking them. They are used with lambda expressions.
+List<String> names = Arrays.asList("John", "Jane", "Jack");
+names.forEach(System.out::println);
+How do you handle concurrency with the new features in Java 8?
+
+Java 8 introduced enhancements in the java.util.concurrent package and parallel streams for parallel processing.
+List<String> names = Arrays.asList("John", "Jane", "Jack");
+names.parallelStream().forEach(System.out::println);
+Can you provide an example of using the Collectors class in Java 8?
+
+Collectors is used to collect stream elements into collections, summarizing statistics, and more.
+List<String> names = Arrays.asList("John", "Jane", "Jack");
+String result = names.stream()
+                     .collect(Collectors.joining(", "));
+System.out.println(result); // Output: John, Jane, Jack
+
+In Java, both Comparator and Comparable are used to define the order of objects, but they serve different purposes and are used in different ways. Here's a quick guide on how to use them:
+
+Comparable
+The Comparable interface is used to define the natural ordering of objects. A class that implements Comparable must override the compareTo method. This method compares the current object with another object of the same type.
+
+Example:
+
+public class Person implements Comparable<Person> {
+    private String name;
+    private int age;
+
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    @Override
+    public int compareTo(Person other) {
+        return this.age - other.age; // Sort by age
+    }
+
+    // Getters, setters, and toString() omitted for brevity
+}
+To sort a list of Person objects:
+
+List<Person> people = new ArrayList<>();
+people.add(new Person("Alice", 30));
+people.add(new Person("Bob", 25));
+people.add(new Person("Charlie", 35));
+
+Collections.sort(people);
+for (Person p : people) {
+    System.out.println(p);
+}
+Comparator
+The Comparator interface is used to define multiple ways of comparing objects. You can create separate classes or use lambda expressions to implement the Comparator interface.
+
+Example:
+
+public class AgeComparator implements Comparator<Person> {
+    @Override
+    public int compare(Person p1, Person p2) {
+        return p1.getAge() - p2.getAge(); // Sort by age
+    }
+}
+To use the Comparator:
+
+List<Person> people = new ArrayList<>();
+people.add(new Person("Alice", 30));
+people.add(new Person("Bob", 25));
+people.add(new Person("Charlie", 35));
+
+Collections.sort(people, new AgeComparator());
+for (Person p : people) {
+    System.out.println(p);
+}
+Key Differences
+Comparable: Used for natural ordering. The class itself must implement the Comparable interface.
+Comparator: Used for custom ordering. You can create multiple Comparator implementations to sort objects in different ways.
+Best Practices
+Use Comparable when you have a single, natural sorting order.
+Use Comparator when you need multiple sorting criteria or when you cannot modify the class to implement Comparable.
+
+Creating complex XPath expressions using siblings and ancestors can be quite powerful for navigating and selecting elements in an HTML document. Here are some key concepts and examples to help you get started:
+
+XPath Axes Methods
+Ancestor Axis:
+
+Selects all ancestor elements (parent, grandparent, etc.) of the current node.
+Example: //div[@id='child']/ancestor::div selects all ancestor <div> elements of the <div> with id='child'.
+Following-Sibling Axis:
+
+Selects all sibling elements that follow the current node.
+Example: //h2[@class='title']/following-sibling::p selects all <p> elements that are siblings following the <h2> with class='title'.
+Preceding-Sibling Axis:
+
+Selects all sibling elements that precede the current node.
+Example: //h2[@class='title']/preceding-sibling::p selects all <p> elements that are siblings preceding the <h2> with class='title'.
+Combining Axes for Complex Queries
+You can combine these axes to create more specific and complex XPath queries. Here are a few examples:
+
+Selecting a Sibling Based on an Ancestor:
+
+//div[@class='container']/ancestor::body//following-sibling::div[@class='sibling']
+This selects <div> elements with class='sibling' that are siblings following any <div> with class='container' within the same <body> ancestor.
+
+Selecting an Element Based on a Sibling's Attribute:
+
+//div[@id='main']/following-sibling::div[@data-role='content']
+This selects <div> elements with data-role='content' that are siblings following the <div> with id='main'.
+
+Practical Example
+Consider a scenario where you have a list of items, and you want to select a specific item based on its sibling's content:
+
+<ul>
+  <li class="item">Item 1</li>
+  <li class="item">Item 2</li>
+  <li class="item special">Special Item</li>
+  <li class="item">Item 3</li>
+</ul>
+To select the <li> element with class='item' that follows the Special Item, you can use:
+
+//li[contains(text(),'Special Item')]/following-sibling::li[@class='item']
+This XPath expression selects the <li> element with class='item' that is a sibling following the <li> containing the text Special Item.
+
+Rest Assured : -
+
+JsonPath -> To retrieve the Json Response
+log().all() -> To Print logs
+
+Attach file through Postman in Jira : -
+
+Body select -> form-data -> Key : file &  Value : path of the screenshot
+
+Rest Assured : -
+
+use multiPart("file", new file(path of screenshot));
+
+
+Return type of "RequestSpecBuilder" is "RequestSpecification"
+
+Return type of "ResponseSpecBuilder" is "ResponseSpecification"
+
+To Bypass SSL Certificates use -> RequestSpecification req = given().relaxedHTTPSValidation()
+
+To Perform Serialization & De-Serialization -> Add Jackson-databind maven dependency
+
+Pojo classes need to be defined under -> src/main/java
+
+feature files, Stepdefinition class, Runner class need to be define under -> src/test/java
+
+Key Differences Between Interface and Constructor:
+Feature	Interface	Constructor
+Purpose	Defines a contract for classes to implement methods.	Initializes an object and sets its initial state.
+Return Type	Cannot have a return type.	No return type (not even void).
+Object Creation	Cannot create objects; it only specifies behavior.	Used to create objects of a class.
+Inheritance	Can be implemented by multiple classes.	Cannot be inherited; constructors are tied to a class.
+Methods	Can only declare methods (except default or static).	A constructor is a special method used for object creation.
+Modifiers	Methods in an interface are public by default.	Constructors can have access modifiers (public, private, etc.).
+
+Access Modifiers in Java : -
+
+public: Accessible anywhere.
+private: Accessible only within the same class.
+protected: Accessible within the same package and by subclasses.
+Default (Package-Private): Accessible only within the same package.
+
+String:
+
+Immutable: Once a String object is created, its value cannot be changed. If you modify a String,
+a new String object is created with the new value, and the old one is discarded.
+
+String str = "Hello";
+str = str + " World";  // A new String object is created
+
+StringBuilder:
+
+Mutable: The contents of a StringBuilder can be modified without creating a new object.
+You can append, insert, or delete characters directly in the existing object, which makes StringBuilder more efficient when modifying strings repeatedly.
+
+StringBuilder sb = new StringBuilder("Hello");
+sb.append(" World");  // Modifies the same StringBuilder object
+
+Performance  : string is less efficient , SB is more efficient
+Thread safety : string is TS, SB is not TS
+
+StringBuffer: If you need a mutable string but with thread safety, you could use StringBuffer, which is similar to StringBuilder
+but synchronized (making it slower than StringBuilder in most cases).
+
+Memory Usage : string uses More Memory Intensive and SB is Less Memory Intensive
+
+String:
+String provides methods for comparing, slicing, searching, and other operations, but all modifications (like concatenation or replacements) create new String objects.
+Common methods:
+.concat()
+.substring()
+.toUpperCase()
+.equals()
+
+StringBuilder:
+StringBuilder provides methods to modify the string directly, such as appending, inserting, deleting, or reversing.
+Common methods:
+.append()
+.insert()
+.delete()
+.reverse()
+.toString() (to convert StringBuilder to a String)
+
+Summary: String vs StringBuilder
+Aspect	String	StringBuilder
+Mutability	Immutable (cannot be changed after creation)	Mutable (can be modified)
+Performance	Less efficient for frequent modifications	More efficient for frequent modifications
+Thread Safety	Thread-safe (since immutable)	Not thread-safe
+Memory Usage	More memory-intensive (creates new objects)	Less memory-intensive (modifies in place)
+Use Case	When the string is not modified often	When the string needs to be modified often
+Example	String s = "Hello";	StringBuilder sb = new StringBuilder();
+
+ Jenkins : -
+
+Creating a job in Jenkins to run an automation script involves several steps. Here's a step-by-step guide to help you set it up:
+
+Step 1: Install Jenkins
+If you haven't already, download and install Jenkins from the official website. Follow the installation instructions for your operating system.
+
+Step 2: Access Jenkins Dashboard
+Open your web browser and go to http://localhost:8080 (or the URL where Jenkins is hosted). Log in with your credentials.
+
+Step 3: Create a New Job
+Click on "New Item" in the Jenkins dashboard.
+Enter a name for your job.
+Select "Freestyle project" and click "OK".
+Step 4: Configure the Job
+General Settings:
+
+Add a description for your job if needed.
+Source Code Management:
+
+If your automation script is stored in a version control system like Git, select "Git" and enter the repository URL and credentials.
+Build Triggers:
+
+Set up triggers to determine when the job should run. For example, you can schedule it to run at specific times or trigger it after another job completes.
+Build Environment:
+
+Configure any environment settings required for your script.
+Build Steps:
+
+Click on "Add build step" and select the appropriate option based on your script type. For example:
+
+Execute shell for shell scripts.
+Invoke Ant for Ant build scripts.
+Execute Windows batch command for batch files.
+Invoke Gradle script for Gradle builds.
+Enter the command to run your automation script. For example, if you're running a shell script:
+
+./your-script.sh
+Step 5: Post-build Actions
+Add post-build actions if needed, such as sending email notifications or archiving artifacts.
+Step 6: Save and Run the Job
+Click "Save" to save your job configuration.
+Click "Build Now" to run the job immediately.
+Example
+Here's a simple example of configuring a job to run a shell script:
+
+New Item: Name it MyAutomationJob, select "Freestyle project", and click "OK".
+Source Code Management: Select "Git" and enter your repository URL.
+Build Steps: Add a build step "Execute shell" and enter:
+./run-tests.sh
+Save and Build Now.
+This will trigger the job and run your run-tests.sh script.
